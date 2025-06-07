@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设备管理系统</title>
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="content" id="content">
+            <!-- 内容区域 - 动态加载 -->
+            <div id="shouye" class="page active">
+                <div class="page-header">
+                    <h2>设备列表</h2>
+                    <button id="addItemBtn" class="primary-btn">刷新</button>
+                </div>
+                <div class="data-table">
+                    <table id="dataTable">
+                        <thead>
+                            <tr>
+                                <th>序列号</th>
+                                <th>设备状态</th>
+                                <th>类型</th>
+                                <th>奖励</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <!-- 数据将由JS动态加载 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tongji" class="page">
+                <div class="page-header">
+                    <h2>统计数据</h2>
+                </div>
+                <div class="charts-container">
+                    <div class="chart-box">
+                        <h3>设备类型分布</h3>
+                        <canvas id="deviceTypeChart"></canvas>
+                    </div>
+                    <div class="chart-box">
+                        <h3>设备状态统计</h3>
+                        <canvas id="deviceStatusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div id="wode" class="page">
+                <div class="user-header">
+                    <div class="header-bg">
+                        <h2 class="platform-title">任务平台 <span class="ship-icon">🚢</span></h2>
+                        <div class="user-profile-container">
+                            <div class="avatar-wrapper">
+                                <img id="userAvatar" src="https://via.placeholder.com/80" alt="用户头像">
+                            </div>
+                            <div class="user-info-wrapper">
+                                <h2 id="userName">刘明泽</h2>
+                                <div class="invite-code">
+                                    <span>邀请码：</span>
+                                    <span id="inviteCode">■</span>
+                                </div>
+                            </div>
+                            <div class="verify-badge">
+                                <span class="verify-icon">✓</span>
+                                <span>已认证</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="account-card">
+                    <div class="account-header">
+                        <div class="crown-icon">👑</div>
+                        <div class="account-title">我的账户</div>
+                        <div class="withdraw-record">提现记录</div>
+                    </div>
+                    <div class="account-body">
+                        <div class="account-balance">
+                            <div class="balance-amount">
+                                <span class="currency">¥</span>
+                                <span class="amount">3942.00</span>
+                            </div>
+                            <div class="account-label">账号余额（元）</div>
+                        </div>
+                        <div class="account-details">
+                            <div class="account-detail-item">
+                                <div class="detail-value">¥ 257300.00</div>
+                                <div class="detail-label">累计收入</div>
+                            </div>
+                            <div class="account-detail-item">
+                                <div class="detail-value">¥ 3942.00</div>
+                                <div class="detail-label">可以提现</div>
+                            </div>
+                        </div>
+                        <div class="withdraw-button-container">
+                            <button class="withdraw-button">提现</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="feature-buttons">
+                    <div class="feature-button">
+                        <div class="feature-icon announcement-icon"></div>
+                        <div class="feature-name">公告通知</div>
+                    </div>
+<!--                    <div class="feature-button">-->
+<!--                        <div class="feature-icon default-icon"></div>-->
+<!--                        <div class="feature-name">默认抽成</div>-->
+<!--                    </div>-->
+<!--                    <div class="feature-button">-->
+<!--                        <div class="feature-icon superior-icon"></div>-->
+<!--                        <div class="feature-name">我的上级</div>-->
+<!--                    </div>-->
+                    <div class="feature-button">
+                        <div class="feature-icon review-icon"></div>
+                        <div class="feature-name">审核列表</div>
+                    </div>
+                </div>
+                
+                <div class="tools-section">
+                    <div class="section-title">常用工具</div>
+                    <div class="tools-grid">
+                        <div class="tool-item">
+                            <div class="tool-icon income-icon"></div>
+                            <div class="tool-name">收入记录</div>
+                        </div>
+                        <div class="tool-item">
+                            <div class="tool-icon withdraw-icon"></div>
+                            <div class="tool-name">提现记录</div>
+                        </div>
+                        <div class="tool-item">
+                            <div class="tool-icon support-icon"></div>
+                            <div class="tool-name">客服中心</div>
+                        </div>
+                        <div class="tool-item">
+                            <div class="tool-icon logout-icon"></div>
+                            <div class="tool-name">退出登录</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部导航栏 -->
+        <div class="nav-bar">
+            <div class="nav-item active" data-page="shouye">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+                </div>
+                <span>首页</span>
+            </div>
+            <div class="nav-item" data-page="tongji">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4zm2 2H5V5h14v14zm0-16H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg>
+                </div>
+                <span>统计</span>
+            </div>
+            <div class="nav-item" data-page="wode">
+                <div class="icon">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                </div>
+                <span>我的</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 弹窗 - 添加/编辑设备 -->
+    <div id="itemModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 id="modalTitle">新增设备</h3>
+            <form id="itemForm">
+                <input type="hidden" id="itemId">
+                <div class="form-group">
+                    <label for="serialNo">序列号</label>
+                    <input type="text" id="serialNo" required>
+                </div>
+                <div class="form-group">
+                    <label for="status">设备状态</label>
+                    <input type="text" id="status" value="在线" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="deviceType">类型</label>
+                    <select id="deviceType">
+                        <option value="增加">增加</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="remark">奖励类型</label>
+                    <input type="text" id="remark" placeholder="请输入奖励类型">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="primary-btn">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 弹窗 - 编辑个人资料 -->
+    <div id="userEditModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3>编辑个人资料</h3>
+            <form id="userEditForm">
+                <div class="avatar-upload">
+                    <div class="avatar-preview">
+                        <img id="previewAvatar" src="https://via.placeholder.com/80" alt="预览头像">
+                    </div>
+                    <div class="avatar-edit">
+                        <label for="avatarUpload" class="upload-btn">选择头像</label>
+                        <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="editName">用户名</label>
+                    <input type="text" id="editName" required>
+                </div>
+                <div class="form-group">
+                    <label for="editInviteCode">邀请码</label>
+                    <input type="text" id="editInviteCode">
+                </div>
+                <div class="form-group">
+                    <label for="editPhone">手机号码</label>
+                    <input type="tel" id="editPhone">
+                </div>
+                <div class="form-group">
+                    <label for="editEmail">邮箱地址</label>
+                    <input type="email" id="editEmail">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="primary-btn">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="./shouye.js"></script>
+    <script src="./tongji.js"></script>
+    <script src="./wode.js"></script>
+    <script src="./main.js"></script>
+</body>
+</html> 
