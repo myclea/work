@@ -1,142 +1,147 @@
-// 从本地存储获取设备数据，如果没有则使用默认数据
+/**
+ * 设备管理系统 - 首页JS
+ * 负责设备列表的展示、添加、编辑和删除功能
+ */
+
+// ----------------- 1. 数据模型与初始化 -----------------
+
+// 默认设备数据
 const defaultDeviceData = [
-    { id: 1, serialNo: '21060', status: '710290.62', type: '增加', rewardType: '' },
-    { id: 2, serialNo: '11745', status: '789075.62', type: '增加', rewardType: '' },
-    { id: 3, serialNo: '22275', status: '777330.62', type: '增加', rewardType: '' },
-    { id: 4, serialNo: '22275', status: '755055.62', type: '增加', rewardType: '' },
-    { id: 5, serialNo: '23490', status: '732780.62', type: '增加', rewardType: '' },
-    { id: 6, serialNo: '21060', status: '709290.62', type: '增加', rewardType: '' },
-    { id: 7, serialNo: '22275', status: '688230.62', type: '增加', rewardType: '' },
-    { id: 8, serialNo: '23490', status: '665955.62', type: '增加', rewardType: '' },
-    { id: 9, serialNo: '12345', status: '543210.00', type: '增加', rewardType: '' }
+    { id: 1, serialNo: '21060', status: '在线', type: '增加', rewardType: '激励广告' },
+    { id: 2, serialNo: '11745', status: '在线', type: '增加', rewardType: '激励广告' },
+    { id: 3, serialNo: '22275', status: '在线', type: '增加', rewardType: '激励广告' }
 ];
 
-// 从本地存储中获取数据，如果没有则使用默认数据
+// 设备数据存储
 let deviceData = [];
 
-// DOM 元素
+// ----------------- 2. DOM元素获取 -----------------
+
+// 获取表格和按钮元素
 const tableBody = document.getElementById('tableBody');
 const addItemBtn = document.getElementById('addItemBtn');
+
+// 获取模态框相关元素
 const itemModal = document.getElementById('itemModal');
 const itemForm = document.getElementById('itemForm');
 const modalTitle = document.getElementById('modalTitle');
 const closeModal = itemModal.querySelector('.close');
+
+// 获取表单输入元素
 const itemIdInput = document.getElementById('itemId');
 const serialNoInput = document.getElementById('serialNo');
 const statusInput = document.getElementById('status');
 const typeInput = document.getElementById('deviceType');
 const rewardTypeInput = document.getElementById('remark');
 
-// 初始化函数 - 页面加载时调用
-function initShouye() {
-    console.log("首页初始化开始");
-    
-    // 先从本地存储中加载数据
-    deviceData = loadDeviceDataFromStorage() || defaultDeviceData;
-    
-    // 刷新表格数据
-    refreshTableData();
-    
-    // 添加事件监听器
-    addEventListeners();
-    
-    console.log("首页初始化完成");
-}
+// ----------------- 3. 数据持久化函数 -----------------
 
-// 从本地存储中加载设备数据
+/**
+ * 从本地存储加载设备数据
+ * @returns {Array} 设备数据数组或null
+ */
 function loadDeviceDataFromStorage() {
     try {
-        console.log("尝试从本地存储加载数据");
         const storedData = localStorage.getItem('deviceData');
-        if (storedData) {
-            console.log("找到本地存储数据");
-            const parsedData = JSON.parse(storedData);
-            return parsedData;
-        }
-        console.log("未找到本地存储数据，使用默认数据");
-        return null;
+        return storedData ? JSON.parse(storedData) : null;
     } catch (error) {
         console.error('从本地存储加载数据失败:', error);
         return null;
     }
 }
 
-// 保存设备数据到本地存储
+/**
+ * 保存设备数据到本地存储
+ */
 function saveDeviceDataToStorage() {
     try {
         localStorage.setItem('deviceData', JSON.stringify(deviceData));
-        console.log('设备数据已保存到本地存储, 总条数:', deviceData.length);
+        console.log('数据已保存，共', deviceData.length, '条记录');
     } catch (error) {
         console.error('保存数据到本地存储失败:', error);
     }
 }
 
-// 刷新表格数据
+// ----------------- 4. 表格渲染函数 -----------------
+
+/**
+ * 刷新表格数据显示
+ */
 function refreshTableData() {
-    console.log("刷新表格数据, 设备数量:", deviceData.length);
     // 清空表格
     tableBody.innerHTML = '';
     
-    // 使用设备数据重新填充表格
-    deviceData.forEach(item => {
-        const row = document.createElement('tr');
-        
-        row.innerHTML = `
-            <td>${item.serialNo}</td>
-            <td>在线</td>
-            <td><span class="type-badge type-add">${item.type}</span></td>
-            <td><input type="text" class="reward-input" data-id="${item.id}" value="${item.rewardType || ''}"></td>
-            <td>
-                <button class="action-btn edit-btn" data-id="${item.id}">编辑</button>
-                <button class="action-btn delete-btn" data-id="${item.id}">删除</button>
+    // 如果没有数据，显示空状态
+    if (deviceData.length === 0) {
+        const emptyRow = document.createElement('tr');
+        emptyRow.innerHTML = `
+            <td colspan="5" class="empty-state">
+                暂无设备数据
             </td>
         `;
-        
-        tableBody.appendChild(row);
-    });
+        tableBody.appendChild(emptyRow);
+    } else {
+        // 遍历数据并创建表格行
+        deviceData.forEach(item => {
+            const row = document.createElement('tr');
+            
+            // 设置行内容
+            row.innerHTML = `
+                <td>${item.serialNo}</td>
+                <td>${item.status}</td>
+                <td><span class="type-badge type-add">${item.type}</span></td>
+                <td><input type="text" class="reward-input" data-id="${item.id}" value="${item.rewardType || ''}"></td>
+                <td>
+                    <button class="action-btn edit-btn" data-id="${item.id}">编辑</button>
+                    <button class="action-btn delete-btn" data-id="${item.id}">删除</button>
+                </td>
+            `;
+            
+            // 添加到表格
+            tableBody.appendChild(row);
+        });
+    }
     
-    // 重新添加事件监听
+    // 添加行事件监听
     addRowEventListeners();
     
-    // 添加奖励类型输入框的事件监听
+    // 添加奖励类型输入框事件监听
     addRewardInputListeners();
 }
 
-// 为表格行添加事件监听
+// ----------------- 5. 事件监听器 -----------------
+
+/**
+ * 为表格行添加事件监听
+ */
 function addRowEventListeners() {
-    // 添加编辑和删除按钮的事件监听
-    const editButtons = document.querySelectorAll('.edit-btn');
-    const deleteButtons = document.querySelectorAll('.delete-btn');
-    
-    console.log(`找到 ${editButtons.length} 个编辑按钮和 ${deleteButtons.length} 个删除按钮`);
-    
-    editButtons.forEach(function(btn) {
+    // 编辑按钮事件监听
+    document.querySelectorAll('.edit-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const id = parseInt(this.getAttribute('data-id'));
-            console.log(`编辑按钮点击，ID: ${id}`);
             editItem(id);
         });
     });
     
-    deleteButtons.forEach(function(btn) {
+    // 删除按钮事件监听
+    document.querySelectorAll('.delete-btn').forEach(btn => {
         btn.addEventListener('click', function() {
             const id = parseInt(this.getAttribute('data-id'));
-            console.log(`删除按钮点击，ID: ${id}`);
             deleteItem(id);
         });
     });
 }
 
-// 为奖励类型输入框添加事件监听
+/**
+ * 为奖励类型输入框添加事件监听
+ */
 function addRewardInputListeners() {
-    const rewardInputs = document.querySelectorAll('.reward-input');
-    
-    rewardInputs.forEach(input => {
+    document.querySelectorAll('.reward-input').forEach(input => {
         input.addEventListener('change', function() {
             const id = parseInt(this.getAttribute('data-id'));
             const newValue = this.value;
             
-            // 更新设备数据
+            // 找到设备并更新奖励类型
             const itemIndex = deviceData.findIndex(item => item.id === id);
             if (itemIndex !== -1) {
                 deviceData[itemIndex].rewardType = newValue;
@@ -148,28 +153,21 @@ function addRewardInputListeners() {
     });
 }
 
-// 添加所有事件监听器
+/**
+ * 添加所有事件监听器
+ */
 function addEventListeners() {
-    console.log("正在添加事件监听器");
+    console.log('添加事件监听器');
     
     // 新增设备按钮
-    if (addItemBtn) {
-        console.log("找到新增设备按钮，添加点击事件");
-        addItemBtn.addEventListener('click', function() {
-            console.log("新增设备按钮被点击");
-            openAddModal();
-        });
-    } else {
-        console.error("未找到新增设备按钮!");
-    }
+    addItemBtn.addEventListener('click', function() {
+        openAddModal();
+    });
     
     // 关闭模态框按钮
-    if (closeModal) {
-        closeModal.addEventListener('click', function() {
-            console.log("关闭模态框按钮被点击");
-            closeItemModal();
-        });
-    }
+    closeModal.addEventListener('click', function() {
+        closeItemModal();
+    });
     
     // 点击模态框外部关闭
     window.addEventListener('click', function(e) {
@@ -179,74 +177,90 @@ function addEventListeners() {
     });
     
     // 表单提交事件
-    if (itemForm) {
-        itemForm.addEventListener('submit', function(e) {
-            console.log("表单提交");
-            handleFormSubmit(e);
+    itemForm.addEventListener('submit', function(e) {
+        handleFormSubmit(e);
+    });
+    
+    // 扫一扫按钮点击事件
+    const scanButton = document.querySelector('.scan-button');
+    if (scanButton) {
+        scanButton.addEventListener('click', function() {
+            alert('扫一扫功能暂未实现');
         });
     }
-    
-    // 添加表格行事件监听
-    addRowEventListeners();
 }
 
-// 打开添加设备模态框
+// ----------------- 6. 模态框操作函数 -----------------
+
+/**
+ * 打开添加设备模态框
+ */
 function openAddModal() {
-    console.log("打开新增设备模态框");
+    console.log('打开添加设备模态框');
+    
+    // 设置模态框标题
     modalTitle.textContent = '新增设备';
+    
+    // 重置表单
     itemIdInput.value = '';
     itemForm.reset();
     
+    // 设置默认值
     typeInput.value = '增加';
-    rewardTypeInput.value = '激励广告';
+    statusInput.value = '在线';
+    rewardTypeInput.value = '';
     
+    // 显示模态框
     itemModal.style.display = 'block';
 }
 
-// 打开编辑设备模态框
+/**
+ * 打开编辑设备模态框
+ * @param {number} id 设备ID
+ */
 function editItem(id) {
-    console.log(`打开编辑模态框，ID: ${id}`);
+    console.log(`打开编辑设备模态框，ID: ${id}`);
+    
+    // 查找设备数据
     const item = deviceData.find(device => device.id === id);
     if (!item) {
-        console.error(`未找到ID为 ${id} 的设备数据`);
+        console.error(`未找到ID为 ${id} 的设备`);
         return;
     }
     
+    // 设置模态框标题
     modalTitle.textContent = '编辑设备';
+    
+    // 填充表单数据
     itemIdInput.value = item.id;
     serialNoInput.value = item.serialNo;
     statusInput.value = item.status;
     typeInput.value = item.type;
-    rewardTypeInput.value = item.rewardType;
+    rewardTypeInput.value = item.rewardType || '';
     
+    // 显示模态框
     itemModal.style.display = 'block';
 }
 
-// 删除设备
-function deleteItem(id) {
-    console.log(`删除设备，ID: ${id}`);
-    if (confirm('确定要删除该设备吗？')) {
-        // 更新数据数组
-        deviceData = deviceData.filter(device => device.id !== id);
-        // 更新本地存储
-        saveDeviceDataToStorage();
-        // 刷新表格
-        refreshTableData();
-        console.log(`设备 ID:${id} 已删除`);
-    }
-}
-
-// 关闭模态框
+/**
+ * 关闭模态框
+ */
 function closeItemModal() {
-    console.log("关闭模态框");
+    console.log('关闭模态框');
     itemModal.style.display = 'none';
 }
 
-// 处理表单提交
+// ----------------- 7. 数据操作函数 -----------------
+
+/**
+ * 处理表单提交
+ * @param {Event} e 表单提交事件
+ */
 function handleFormSubmit(e) {
     e.preventDefault();
-    console.log("处理表单提交");
+    console.log('处理表单提交');
     
+    // 获取表单数据
     const nextId = deviceData.length > 0 ? Math.max(...deviceData.map(d => d.id)) + 1 : 1;
     const id = itemIdInput.value ? parseInt(itemIdInput.value) : nextId;
     const serialNo = serialNoInput.value;
@@ -254,57 +268,102 @@ function handleFormSubmit(e) {
     const type = typeInput.value;
     const rewardType = rewardTypeInput.value;
     
-    // 检查是否已存在相同ID的设备
+    // 检查必填字段
+    if (!serialNo) {
+        alert('请输入序列号');
+        return;
+    }
+    
+    // 检查是否是编辑现有设备
     const existingIndex = deviceData.findIndex(device => device.id === id);
     
     if (itemIdInput.value && existingIndex !== -1) {
         // 更新现有设备
         deviceData[existingIndex] = { id, serialNo, status, type, rewardType };
-        console.log(`设备 ID:${id} 已更新`);
-    } else if (!itemIdInput.value) {
-        // 添加新设备，确保ID不重复
-        const newDevice = { id, serialNo, status, type, rewardType };
-        const isDuplicate = deviceData.some(device => 
-            device.serialNo === serialNo && 
-            device.status === status &&
-            device.type === type &&
-            device.rewardType === rewardType);
-            
-        if (!isDuplicate) {
-            deviceData.push(newDevice);
-            console.log(`新设备添加成功，ID:${id}`);
-        } else {
-            console.warn("检测到重复数据，跳过添加");
-            alert("该设备已存在，请勿重复添加！");
-            closeItemModal();
+        console.log(`更新设备数据，ID: ${id}`);
+    } else {
+        // 检查序列号是否重复
+        const isSerialNoExists = deviceData.some(device => device.serialNo === serialNo);
+        
+        if (isSerialNoExists) {
+            alert('该序列号已存在，请使用其他序列号！');
             return;
         }
+        
+        // 添加新设备
+        const newDevice = { id, serialNo, status, type, rewardType };
+        deviceData.push(newDevice);
+        console.log(`新增设备数据，ID: ${id}，序列号: ${serialNo}`);
     }
     
     // 保存到本地存储
     saveDeviceDataToStorage();
+    
     // 刷新表格
     refreshTableData();
     
+    // 关闭模态框
     closeItemModal();
 }
 
-// 确保DOM加载完成后初始化
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("DOM内容加载完成，初始化首页");
-    // 不再每次自动清除数据，只在首次使用时清除一次
-    // 如果需要重置数据，可以在浏览器控制台中手动调用 clearAllStorageAndReload() 函数
-    // clearAllStorageAndReload();
-    initShouye();
-});
+/**
+ * 删除设备
+ * @param {number} id 设备ID
+ */
+function deleteItem(id) {
+    console.log(`准备删除设备，ID: ${id}`);
+    
+    if (confirm('确定要删除该设备吗？')) {
+        // 更新数据数组
+        deviceData = deviceData.filter(device => device.id !== id);
+        
+        // 更新本地存储
+        saveDeviceDataToStorage();
+        
+        // 刷新表格
+        refreshTableData();
+        
+        console.log(`设备已删除，ID: ${id}`);
+    }
+}
 
-// 清除所有本地存储并重新加载默认数据的函数
-// 如果需要重置数据，可以在控制台中调用 clearAllStorageAndReload()
-function clearAllStorageAndReload() {
-    console.log("清除所有本地存储数据并重新加载默认值");
+/**
+ * 重置数据到默认值
+ */
+function resetData() {
+    console.log('重置数据到默认值');
+    
     localStorage.removeItem('deviceData');
-    localStorage.removeItem('userData');
-    deviceData = [...defaultDeviceData];
+    deviceData = JSON.parse(JSON.stringify(defaultDeviceData));
     saveDeviceDataToStorage();
     refreshTableData();
-} 
+    
+    alert('数据已重置！');
+}
+
+// 为方便测试，添加全局重置函数
+window.resetData = resetData;
+
+// ----------------- 8. 初始化函数 -----------------
+
+/**
+ * 首页初始化函数
+ */
+function initShouye() {
+    console.log('首页初始化开始');
+    
+    // 步骤1: 从本地存储加载数据，如果没有则使用默认数据
+    deviceData = loadDeviceDataFromStorage() || defaultDeviceData;
+    console.log(`加载了 ${deviceData.length} 条设备数据`);
+    
+    // 步骤2: 刷新表格数据
+    refreshTableData();
+    
+    // 步骤3: 添加事件监听器
+    addEventListeners();
+    
+    console.log('首页初始化完成');
+}
+
+// 注意：initShouye函数会在main.js中被调用，不需要重复添加事件监听器
+// document.addEventListener('DOMContentLoaded', initShouye); 

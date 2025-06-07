@@ -4,7 +4,10 @@ const defaultUserData = {
     inviteCode: '0',
     avatar: 'https://via.placeholder.com/80',
     phone: '13800138000',
-    email: 'user@example.com'
+    email: 'user@example.com',
+    balance: '3942.00',            // 账号余额
+    totalIncome: '257300.00',      // 累计收入
+    withdrawable: '3942.00'        // 可提现金额
 };
 
 // 从本地存储中获取用户数据，如果没有则使用默认数据
@@ -24,12 +27,18 @@ const previewAvatar = document.getElementById('previewAvatar');
 const avatarUpload = document.getElementById('avatarUpload');
 const closeEditModal = userEditModal.querySelector('.close');
 
+// 余额相关元素
+const balanceAmount = document.querySelector('.amount');
+const totalIncomeValue = document.querySelector('.account-details .account-detail-item:first-child .detail-value');
+const withdrawableValue = document.querySelector('.account-details .account-detail-item:last-child .detail-value');
+
 // 初始化函数 - 页面加载时调用
 function initWode() {
     console.log("我的页面初始化开始");
     // 加载用户数据
     loadUserData();
     setupEventListeners();
+    setupBalanceEditListeners();
     console.log("我的页面初始化完成");
 }
 
@@ -62,6 +71,117 @@ function loadUserData() {
     userName.textContent = userData.name;
     userAvatar.src = userData.avatar;
     inviteCode.textContent = userData.inviteCode;
+    
+    // 加载余额数据
+    balanceAmount.textContent = userData.balance;
+    totalIncomeValue.textContent = `¥ ${userData.totalIncome}`;
+    withdrawableValue.textContent = `¥ ${userData.withdrawable}`;
+}
+
+// 设置余额相关的编辑事件监听器
+function setupBalanceEditListeners() {
+    // 账号余额点击编辑
+    balanceAmount.addEventListener('click', function() {
+        const currentValue = this.textContent;
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.step = '0.01';
+        input.value = currentValue;
+        input.style.width = '120px';
+        input.style.fontSize = '24px';
+        input.style.border = '1px solid #4a90e2';
+        input.style.borderRadius = '4px';
+        input.style.padding = '2px 5px';
+        
+        this.textContent = '';
+        this.appendChild(input);
+        input.focus();
+        
+        // 失去焦点时保存
+        input.addEventListener('blur', function() {
+            const newValue = parseFloat(this.value).toFixed(2);
+            balanceAmount.textContent = newValue;
+            userData.balance = newValue;
+            userData.withdrawable = newValue; // 同步更新可提现金额
+            withdrawableValue.textContent = `¥ ${newValue}`;
+            saveUserDataToStorage();
+        });
+        
+        // 回车键保存
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                this.blur();
+            }
+        });
+    });
+    
+    // 累计收入点击编辑
+    totalIncomeValue.addEventListener('click', function() {
+        const currentValue = userData.totalIncome;
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.step = '0.01';
+        input.value = currentValue;
+        input.style.width = '100px';
+        input.style.fontSize = '16px';
+        input.style.border = '1px solid #4a90e2';
+        input.style.borderRadius = '4px';
+        input.style.padding = '2px 5px';
+        
+        this.textContent = '';
+        this.appendChild(input);
+        input.focus();
+        
+        // 失去焦点时保存
+        input.addEventListener('blur', function() {
+            const newValue = parseFloat(this.value).toFixed(2);
+            totalIncomeValue.textContent = `¥ ${newValue}`;
+            userData.totalIncome = newValue;
+            saveUserDataToStorage();
+        });
+        
+        // 回车键保存
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                this.blur();
+            }
+        });
+    });
+    
+    // 可提现金额点击编辑
+    withdrawableValue.addEventListener('click', function() {
+        const currentValue = userData.withdrawable;
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.step = '0.01';
+        input.value = currentValue;
+        input.style.width = '100px';
+        input.style.fontSize = '16px';
+        input.style.border = '1px solid #4a90e2';
+        input.style.borderRadius = '4px';
+        input.style.padding = '2px 5px';
+        
+        this.textContent = '';
+        this.appendChild(input);
+        input.focus();
+        
+        // 失去焦点时保存
+        input.addEventListener('blur', function() {
+            const newValue = parseFloat(this.value).toFixed(2);
+            withdrawableValue.textContent = `¥ ${newValue}`;
+            userData.withdrawable = newValue;
+            userData.balance = newValue; // 同步更新账号余额
+            balanceAmount.textContent = newValue;
+            saveUserDataToStorage();
+        });
+        
+        // 回车键保存
+        input.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                this.blur();
+            }
+        });
+    });
 }
 
 // 设置事件监听器
