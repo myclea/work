@@ -835,17 +835,20 @@ tr:last-child td {
 
 /* 扫一扫按钮样式 */
 .scan-button-container {
-    position: fixed;
-    bottom: 70px; /* 底部导航栏的高度 + 间距 */
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 99;
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+    padding-bottom: 80px; /* 为底部导航栏留出空间 */
+    position: relative;
+    width: 100%;
 }
 
 .scan-button {
     background-color: #4a90e2;
     color: white;
     border: none;
+    position: fixed;
+    bottom: 70px; /* 距离底部导航栏稍微上方一点 */
     border-radius: 30px;
     padding: 12px 30px;
     display: flex;
@@ -854,6 +857,7 @@ tr:last-child td {
     box-shadow: 0 3px 12px rgba(0, 0, 0, 0.25);
     font-size: 16px;
     cursor: pointer;
+    z-index: 99; /* 确保按钮在上层 */
 }
 
 .scan-icon {

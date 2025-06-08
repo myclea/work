@@ -92,7 +92,6 @@ function refreshTableData() {
                 <td><span class="type-badge type-add">${item.type}</span></td>
                 <td><input type="text" class="reward-input" data-id="${item.id}" value="${item.rewardType || ''}"></td>
                 <td>
-                    <button class="action-btn edit-btn" data-id="${item.id}">编辑</button>
                     <button class="action-btn delete-btn" data-id="${item.id}">删除</button>
                 </td>
             `;
@@ -115,14 +114,6 @@ function refreshTableData() {
  * 为表格行添加事件监听
  */
 function addRowEventListeners() {
-    // 编辑按钮事件监听
-    document.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const id = parseInt(this.getAttribute('data-id'));
-            editItem(id);
-        });
-    });
-    
     // 删除按钮事件监听
     document.querySelectorAll('.delete-btn').forEach(btn => {
         btn.addEventListener('click', function() {
